@@ -30,21 +30,21 @@ class Client:
         This method will be ran in a separate thread as the main/ui thread, because the for-in call is blocking
         when waiting for new messages
         """
-        for note in self.conn.ChatStream(chat.Empty()):
-            print("R[{}] {}".format(note.name, note.message))
-            self.chat_list.insert(END, "[{}] {}\n".format(note.name, note.message))
+        for note in self.conn.ChatStream(chat.Empty()):  # this line will wait for new messages from the server!
+            print("R[{}] {}".format(note.name, note.message))  # debugging statement
+            self.chat_list.insert(END, "[{}] {}\n".format(note.name, note.message))  # add the message to the UI
 
     def send_message(self, event):
         """
         This method is called when user enters something into the textbox
         """
-        message = self.entry_message.get()
+        message = self.entry_message.get()  # retrieve message from the UI
         if message is not '':
-            n = chat.Note()
-            n.name = self.username
-            n.message = message
-            print("S[{}] {}".format(n.name, n.message))
-            self.conn.SendNote(n)
+            n = chat.Note()  # create protobug message (called Note)
+            n.name = self.username  # set the username
+            n.message = message  # set the actual message of the note
+            print("S[{}] {}".format(n.name, n.message))  # debugging statement
+            self.conn.SendNote(n)  # send the Note to the server
 
     def __setup_ui(self):
         self.chat_list = Text()
@@ -58,12 +58,13 @@ class Client:
 
 
 if __name__ == '__main__':
-    root = Tk()
+    root = Tk()  # I just used a very simple Tk window for the chat UI, this can be replaced by anything
     frame = Frame(root, width=300, height=300)
     frame.pack()
     root.withdraw()
     username = None
     while username is None:
+        # retrieve a username so we can distinguish all the different clients
         username = simpledialog.askstring("Username", "What's your username?", parent=root)
-    root.deiconify()
-    c = Client(username, frame)
+    root.deiconify()  # don't remember why this was needed anymore...
+    c = Client(username, frame)  # this starts a client and thus a thread which keeps connection to server open

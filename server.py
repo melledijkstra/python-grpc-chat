@@ -7,7 +7,7 @@ import proto.chat_pb2 as chat
 import proto.chat_pb2_grpc as rpc
 
 
-class ChatServer(rpc.ChatServerServicer):
+class ChatServer(rpc.ChatServerServicer):  # inheriting here from the protobuf rpc file which is generated
 
     def __init__(self):
         # List with all the chat history
@@ -40,21 +40,25 @@ class ChatServer(rpc.ChatServerServicer):
         :param context:
         :return:
         """
+        # this is only for the server console
         print("[{}] {}".format(request.name, request.message))
         # Add it to the chat history
         self.chats.append(request)
-        return chat.Empty()
+        return chat.Empty()  # something needs to be returned required by protobuf language, we just return empty msg
 
 
 if __name__ == '__main__':
-    port = 11912
-    # create a gRPC server
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    rpc.add_ChatServerServicer_to_server(ChatServer(), server)
-
+    port = 11912  # a random port for the server to run on
+    # the workers is like the amount of threads that can be opened at the same time, when there are 10 clients connected
+    # then no more clients able to connect to the server.
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # create a gRPC server
+    rpc.add_ChatServerServicer_to_server(ChatServer(), server)  # register the server to gRPC
+    # gRPC basically manages all the threading and server responding logic, which is perfect!
     print('Starting server. Listening...')
     server.add_insecure_port('[::]:' + str(port))
     server.start()
-    # Server starts in background (another thread) so keep waiting
+    # Server starts in background (in another thread) so keep waiting
+    # if we don't wait here the main thread will end, which will end all the child threads, and thus the threads
+    # from the server won't continue to work and stop the server
     while True:
         time.sleep(64 * 64 * 100)
