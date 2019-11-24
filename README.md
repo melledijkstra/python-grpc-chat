@@ -1,6 +1,12 @@
 # Python gRPC Chat
 Chat application created with gRPC. This was a study for bidirectional gRPC streaming.
 
+# Demo
+
+![Chat System](chat-system-inaction.gif)
+
+![Chat System](chat-system.png)
+
 ## Server
 
 ```python
@@ -109,9 +115,3 @@ service ChatServer {
     rpc SendNote (Note) returns (Empty);
 }
 ```
-
-# DEMO
-
-![Chat System](chat-system-inaction.gif)
-
-![Chat System](chat-system.png)
